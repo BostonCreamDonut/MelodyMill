@@ -1,0 +1,90 @@
+{
+  "id": "cat_mill",
+  "name": "Cat Mill",
+  "resource_name": "Yarn",
+  "click_action_name": "Bat the Yarn",
+  "prestige_action_name": "Spin Into Harmony",
+  "prestige_goal_resource": 80000,
+  "stages": [
+    { "name": "Small Yarn Ball", "goal": 40 },
+    { "name": "Thick Yarn Ball", "goal": 250 },
+    { "name": "Giant Yarn Bundle", "goal": 1800 },
+    { "name": "Royal Yarn Sphere", "goal": 12000 },
+    { "name": "Cosmic Yarn Moon", "goal": 75000 }
+  ],
+  "upgrades": [
+    {
+      "id": "kitten",
+      "name": "Kitten",
+      "base_cost": 15,
+      "cost_growth": 1.15,
+      "type": "common",
+      "click_bonus": 0.25,
+      "auto_rate": 0.45,
+      "lane": "melody",
+      "description": "A curious kitten paws the yarn and adds a bright melody note."
+    },
+    {
+      "id": "house_cat",
+      "name": "House Cat",
+      "base_cost": 80,
+      "cost_growth": 1.17,
+      "type": "common",
+      "auto_rate": 1.8,
+      "lane": "melody",
+      "description": "A full-grown cat keeps the yarn moving with reliable rhythm."
+    },
+    {
+      "id": "scratching_post",
+      "name": "Scratching Post",
+      "base_cost": 220,
+      "cost_growth": 1.18,
+      "type": "support",
+      "auto_multiplier": 0.12,
+      "lane": "percussion",
+      "description": "Adds a percussive groove and helps every cat hit harder."
+    },
+    {
+      "id": "yarn_basket",
+      "name": "Yarn Basket",
+      "base_cost": 650,
+      "cost_growth": 1.2,
+      "type": "support",
+      "production_multiplier": 0.08,
+      "lane": "texture",
+      "description": "Bundles loose yarn into cleaner production and soft texture."
+    },
+    {
+      "id": "cat_tower",
+      "name": "Cat Tower",
+      "base_cost": 1900,
+      "cost_growth": 1.22,
+      "type": "rare",
+      "auto_rate": 8.0,
+      "auto_multiplier": 0.08,
+      "lane": "bass",
+      "description": "High ground for the cats, plus a deeper bass pulse."
+    },
+    {
+      "id": "cat_choir",
+      "name": "Cat Choir",
+      "base_cost": 8200,
+      "cost_growth": 1.25,
+      "type": "rare",
+      "production_multiplier": 0.18,
+      "lane": "texture",
+      "description": "A chorus of meows turns the mill into a fuller arrangement."
+    },
+    {
+      "id": "grand_meowstro",
+      "name": "Grand Meowstro",
+      "base_cost": 34000,
+      "cost_growth": 1.28,
+      "type": "capstone",
+      "auto_rate": 30.0,
+      "production_multiplier": 0.35,
+      "lane": "bass",
+      "description": "The late-run conductor cat that makes the whole song bloom."
+    }
+  ]
+}

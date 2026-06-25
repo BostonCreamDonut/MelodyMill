@@ -1,0 +1,26 @@
+{
+  "id": "default_cat_theme",
+  "name": "Cozy Cat",
+  "pack_type": "full",
+  "author": "Melody Mill",
+  "version": "0.1.0",
+  "target_game_version": "0.1.0",
+  "supported_mills": ["cat_mill"],
+  "palette": {
+    "background": "#f8f3e6",
+    "panel": "#fffaf0",
+    "panel_alt": "#f6e8c8",
+    "accent": "#f59f4c",
+    "button": "#ffd27a",
+    "button_text": "#3a2c28",
+    "text": "#3a2c28",
+    "muted_text": "#6f5a52"
+  },
+  "labels": {
+    "mill_title": "Cat Mill",
+    "resource_name": "Yarn",
+    "click_action_name": "Bat the Yarn",
+    "prestige_action_name": "Spin Into Harmony"
+  },
+  "upgrade_name_overrides": {}
+}
