@@ -25,10 +25,11 @@ The player is not just making numbers go up. They are building a living music ma
 9. Spend Harmony Points on permanent upgrades, new Mills, and creative unlocks.
 
 ## Game Structure
-The game should clearly separate progression systems from customization systems.
+The game should clearly separate progression systems from customization systems. Player-facing progression is organized around **Islands**: each Island is a themed gameplay world with its own Mill, resource fantasy, upgrade cast, art direction, and music identity.
 
 ### Core Terms
-- **Mill / World**: an official gameplay space with its own resource, upgrades, visuals, and music identity.
+- **Island**: a major unlockable world and album-like theme, such as Cat Island, Robot Island, Spooky Island, or Ocean Island.
+- **Mill / World**: the playable production machine inside an Island, with its own resource, upgrades, visuals, and music identity.
 - **Theme Pack**: a swappable presentation layer that can change icons, names, colors, backgrounds, and sounds.
 - **Sound Pack**: an optional subset of a Theme Pack focused only on audio.
 
@@ -36,15 +37,18 @@ The game should clearly separate progression systems from customization systems.
 - **Mills change gameplay structure**
 - **Theme Packs change presentation**
 
+Unlocking a new Island should unlock the next official gameplay theme and its matching Mill. Theme Packs can then remix the presentation of unlocked Islands without changing their gameplay balance.
+
 Custom content should not change prices, production values, rhythm rules, or unlock conditions in version 1.
 
 ## Progression Model
 Progression should be a hybrid:
 
-- players unlock new Mills over time
-- once a Mill is unlocked, they can switch between unlocked Mills whenever they want
-- each Mill has its own local progress and local resource
-- all Mills feed a shared global meta progression through Harmony Points
+- players unlock new Islands over time
+- each Island contains its own flagship Mill
+- once an Island is unlocked, players can switch between unlocked Islands whenever they want
+- each Island/Mill has its own local progress and local resource
+- all Islands feed a shared global meta progression through Harmony Points
 
 This keeps the game feeling expandable while still preserving the satisfaction of unlocking new worlds.
 
@@ -68,8 +72,8 @@ Each Mill should be built from the same gameplay skeleton, but have its own flav
 | Spooky Mill | Haunted Orb | Eerie and whimsical | Music box, choir, ghostly FX | Slow build into dramatic crescendos |
 | Ocean Mill | Coral Pearl | Calm and fluid | Marimba, water percussion, airy pads | Gentle wave timing that shifts patterns |
 
-## Launch World
-Version 1 should launch with **Cat Mill** as the flagship Mill.
+## Launch Island
+Version 1 should launch with **Cat Island** and **Cat Mill** as the flagship Island/Mill pair.
 
 ### Cat Mill Stage Examples
 - Small Yarn Ball

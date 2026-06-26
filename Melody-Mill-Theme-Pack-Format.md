@@ -6,11 +6,14 @@ This document defines the best path for player-made visual and audio customizati
 ## Core Recommendation
 Separate gameplay from customization completely.
 
-- `Mills` define mechanics and progression
+- `Islands` define major progression themes
+- `Mills` define mechanics and local progression inside each Island
 - `Theme Packs` define presentation
 - `Sound Packs` optionally replace only audio-facing slots
 
 This keeps UGC fun without letting it break balance.
+
+Official Island unlocks and Theme Packs are related but separate. Unlocking a new Island gives the player a new core world theme and Mill. Applying a Theme Pack remixes the look, names, colors, and optional sounds of an Island the player already has access to.
 
 ## Version 1 Scope
 Version 1 should support local and swappable Theme Packs, but with strong limits.

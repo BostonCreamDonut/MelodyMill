@@ -1,28 +1,28 @@
 extends Node
 class_name AudioConductor
 
-const LANE_ORDER := ["percussion", "melody", "bass", "texture"]
+const LANE_ORDER = ["percussion", "melody", "bass", "texture"]
 
-var bpm := 96.0
-var enabled := true
-var lane_intensity := {
+var bpm = 96.0
+var enabled = true
+var lane_intensity = {
 	"percussion": 0,
 	"melody": 0,
 	"bass": 0,
 	"texture": 0
 }
-var lane_volume := {
+var lane_volume = {
 	"percussion": 0.9,
 	"melody": 0.8,
 	"bass": 0.75,
 	"texture": 0.65
 }
-var lane_players := {}
+var lane_players = {}
 var click_player: AudioStreamPlayer
 var step_timer: Timer
-var step_index := 0
-var stream_cache := {}
-var lane_patterns := {
+var step_index = 0
+var stream_cache = {}
+var lane_patterns = {
 	"percussion": [
 		[48, -1, 48, -1, 48, -1, 50, -1, 48, -1, 48, -1, 51, -1, 50, -1],
 		[48, -1, 50, -1, 48, 50, -1, -1, 48, -1, 50, -1, 51, -1, 48, -1],
@@ -89,7 +89,7 @@ func _on_step() -> void:
 		return
 
 	for lane in LANE_ORDER:
-		var intensity := int(lane_intensity.get(lane, 0))
+		var intensity = int(lane_intensity.get(lane, 0))
 		if intensity <= 0:
 			continue
 
@@ -97,8 +97,8 @@ func _on_step() -> void:
 		if patterns.is_empty():
 			continue
 
-		var available_patterns := max(1, min(patterns.size(), intensity + 1))
-		var pattern := patterns[int(step_index / 16) % available_patterns]
+		var available_patterns = max(1, min(patterns.size(), intensity + 1))
+		var pattern = patterns[int(step_index / 16) % available_patterns]
 		var note = int(pattern[step_index % pattern.size()])
 		if note >= 0:
 			_play_lane_note(lane, note)
@@ -111,7 +111,7 @@ func _play_lane_note(lane: String, midi_note: int) -> void:
 	if player == null:
 		return
 
-	var cache_key := "%s:%s" % [lane, midi_note]
+	var cache_key = "%s:%s" % [lane, midi_note]
 	if not stream_cache.has(cache_key):
 		stream_cache[cache_key] = _generate_stream_for_lane(lane, midi_note)
 
@@ -122,7 +122,7 @@ func _play_lane_note(lane: String, midi_note: int) -> void:
 
 func _create_players() -> void:
 	for lane in LANE_ORDER:
-		var player := AudioStreamPlayer.new()
+		var player = AudioStreamPlayer.new()
 		player.bus = "Master"
 		add_child(player)
 		lane_players[lane] = player
@@ -137,7 +137,7 @@ func _prepare_click_stream() -> void:
 
 
 func _generate_stream_for_lane(lane: String, midi_note: int) -> AudioStreamWAV:
-	var frequency := 440.0 * pow(2.0, (midi_note - 69.0) / 12.0)
+	var frequency = 440.0 * pow(2.0, (midi_note - 69.0) / 12.0)
 	match lane:
 		"percussion":
 			return _generate_tone_stream(frequency, 0.09, "square", 0.18)
@@ -150,17 +150,17 @@ func _generate_stream_for_lane(lane: String, midi_note: int) -> AudioStreamWAV:
 
 
 func _generate_tone_stream(freq: float, duration: float, waveform: String, volume: float) -> AudioStreamWAV:
-	var sample_rate := 44100
-	var frame_count := int(sample_rate * duration)
-	var bytes := PackedByteArray()
+	var sample_rate = 44100
+	var frame_count = int(sample_rate * duration)
+	var bytes = PackedByteArray()
 	bytes.resize(frame_count * 2)
 
 	for i in frame_count:
-		var t := float(i) / sample_rate
-		var envelope := 1.0 - (float(i) / max(1.0, float(frame_count)))
+		var t = float(i) / sample_rate
+		var envelope = 1.0 - (float(i) / max(1.0, float(frame_count)))
 		envelope = pow(envelope, 1.4)
-		var phase := TAU * freq * t
-		var raw := 0.0
+		var phase = TAU * freq * t
+		var raw = 0.0
 		match waveform:
 			"square":
 				raw = 1.0 if sin(phase) >= 0.0 else -1.0
@@ -169,12 +169,12 @@ func _generate_tone_stream(freq: float, duration: float, waveform: String, volum
 			_:
 				raw = sin(phase)
 
-		var sample_value := clamp(raw * envelope * volume, -1.0, 1.0)
-		var sample_int := int(sample_value * 32767.0)
+		var sample_value = clamp(raw * envelope * volume, -1.0, 1.0)
+		var sample_int = int(sample_value * 32767.0)
 		bytes[i * 2] = sample_int & 0xFF
 		bytes[i * 2 + 1] = (sample_int >> 8) & 0xFF
 
-	var stream := AudioStreamWAV.new()
+	var stream = AudioStreamWAV.new()
 	stream.format = AudioStreamWAV.FORMAT_16_BITS
 	stream.mix_rate = sample_rate
 	stream.stereo = false

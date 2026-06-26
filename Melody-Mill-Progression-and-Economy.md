@@ -8,7 +8,7 @@ Build progression in this order:
 
 1. Tune `Cat Mill` from first click to first prestige.
 2. Add the `Harmony Points` loop and a small global `Harmony Tree`.
-3. Add a second Mill only after the first prestige cycle feels good.
+3. Add a second Island/Mill only after the first prestige cycle feels good.
 
 Do not tune multiple Mills at once. A clicker game lives or dies on pacing, so the first working loop should be:
 
@@ -32,7 +32,7 @@ These are the recommended targets for a first playable build.
 ### Repeat Sessions
 - Second prestige: `10-15 minutes`
 - Mature prestige loop: `8-12 minutes`
-- First new Mill unlock: `90-120 minutes` total playtime
+- First new Island unlock: `90-120 minutes` total playtime
 
 ### Music Improvement Cadence
 - Early game: the song should noticeably improve every `1-2 minutes`
@@ -150,16 +150,16 @@ Keep the early tree generous.
 - Strong automation or music node: `5-8 Harmony`
 - Major unlock: `10-15 Harmony`
 
-## New Mill Unlocking
-Do not hide the first new Mill too deep in the tree.
+## New Island Unlocking
+Do not hide the first new Island too deep in the tree. A new Island should introduce the next official gameplay theme, resource fantasy, visual language, and music palette.
 
 ### Best Path
 - first prestige unlocks the concept of Harmony
 - first few Harmony purchases make the player feel stronger
-- first new Mill becomes available after `3-5 prestiges`
-- target cost for the first new Mill: around `25 Harmony`
+- first new Island becomes available after `3-5 prestiges`
+- target cost for the first new Island: around `25 Harmony`
 
-The first new Mill should feel earned, but not so late that players assume the game only has one world.
+The first new Island should feel earned, but not so late that players assume the game only has one world.
 
 ## Harmony Tree Structure
 The global tree should stay small in version 1.
