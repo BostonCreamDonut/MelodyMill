@@ -58,18 +58,22 @@ class ToyboxMillScene:
 		var panel = Color(palette.get("panel", "#fffaf0"))
 		var panel_alt = Color(palette.get("panel_alt", "#f6e8c8"))
 		var accent = Color(palette.get("accent", "#f59f4c"))
-		var button = Color(palette.get("button", "#ffd27a"))
 		var text = Color(palette.get("text", "#3a2c28"))
 		var muted = Color(palette.get("muted_text", "#6f5a52"))
+		var floor_color = Color(palette.get("scene_floor", panel_alt))
+		var rug_color = Color(palette.get("scene_rug", panel))
+		var yarn_color = Color(palette.get("scene_yarn", "#ffc766"))
+		var cat_primary = Color(palette.get("scene_cat_primary", "#ffd67b"))
+		var cat_secondary = Color(palette.get("scene_cat_secondary", "#f3a251"))
 		var rect = Rect2(Vector2.ZERO, size)
 
 		draw_rect(rect, bg)
 		_draw_wallpaper(bg, panel_alt)
-		_draw_floor(panel_alt, panel)
+		_draw_floor(floor_color, rug_color)
 		_draw_shelves(panel, muted)
 		_draw_music_staff(accent, muted)
-		_draw_cats(text, accent, button)
-		_draw_yarn(accent, button, text)
+		_draw_cats(text, cat_primary, cat_secondary)
+		_draw_yarn(accent, yarn_color, text)
 		_draw_lane_lights(accent, panel, muted)
 		_draw_scene_labels(text, muted)
 
@@ -110,13 +114,13 @@ class ToyboxMillScene:
 			draw_circle(Vector2(x, y), 7.0 + sin(pulse * 4.0 + i) * 1.2, note_color)
 			draw_line(Vector2(x + 6, y), Vector2(x + 6, y - 32), note_color, 3.0)
 
-	func _draw_cats(text: Color, accent: Color, button: Color) -> void:
+	func _draw_cats(text: Color, cat_primary: Color, cat_secondary: Color) -> void:
 		var cat_count = clamp(_owned_total(), 0, 9)
 		var floor_y = size.y * 0.70
 		for i in cat_count:
 			var x = size.x * (0.19 + (i % 5) * 0.15)
 			var y = floor_y + 34 + int(i / 5) * 48 + sin(pulse * 2.0 + i) * 4.0
-			var body = button.lightened(0.08) if i % 2 == 0 else accent.lightened(0.18)
+			var body = cat_primary if i % 2 == 0 else cat_secondary
 			_draw_cat(Vector2(x, y), 0.72 + (i % 3) * 0.08, body, text)
 
 	func _draw_cat(center: Vector2, scale: float, body: Color, ink: Color) -> void:
@@ -140,12 +144,12 @@ class ToyboxMillScene:
 		draw_arc(center + Vector2(0, -8) * scale, 7.0 * scale, 0.2, PI - 0.2, 16, ink, 1.8 * scale)
 		draw_arc(center + Vector2(24, 10) * scale, 22.0 * scale, -1.5, 0.45, 18, body.darkened(0.06), 6.0 * scale)
 
-	func _draw_yarn(accent: Color, button: Color, ink: Color) -> void:
+	func _draw_yarn(accent: Color, yarn_base: Color, ink: Color) -> void:
 		var center = _yarn_center()
 		var radius = _yarn_radius()
 		var growth = 1.0 + stage_index * 0.12 + yarn_bump * 0.08
 		var r = radius * growth
-		var yarn = button.lerp(accent, 0.30)
+		var yarn = yarn_base
 		draw_circle(center + Vector2(0, r * 0.12), r * 1.05, Color(0, 0, 0, 0.08))
 		draw_circle(center, r, yarn)
 		draw_circle(center + Vector2(-r * 0.25, -r * 0.22), r * 0.22, yarn.lightened(0.12))
@@ -190,7 +194,7 @@ class ToyboxMillScene:
 		return position.distance_to(_yarn_center()) <= _yarn_radius() * (1.0 + stage_index * 0.12 + 0.16)
 
 	func _yarn_center() -> Vector2:
-		return Vector2(size.x * 0.52, size.y * 0.50)
+		return Vector2(size.x * 0.50, size.y * 0.49)
 
 	func _yarn_radius() -> float:
 		return min(size.x, size.y) * 0.17
@@ -300,10 +304,10 @@ func _build_ui() -> void:
 	var margin = MarginContainer.new()
 	margin.anchor_right = 1.0
 	margin.anchor_bottom = 1.0
-	margin.add_theme_constant_override("margin_left", 18)
-	margin.add_theme_constant_override("margin_right", 18)
-	margin.add_theme_constant_override("margin_top", 16)
-	margin.add_theme_constant_override("margin_bottom", 16)
+	margin.add_theme_constant_override("margin_left", 12)
+	margin.add_theme_constant_override("margin_right", 12)
+	margin.add_theme_constant_override("margin_top", 10)
+	margin.add_theme_constant_override("margin_bottom", 10)
 	add_child(margin)
 
 	var root = VBoxContainer.new()
@@ -315,7 +319,7 @@ func _build_ui() -> void:
 
 	var main_split = HSplitContainer.new()
 	main_split.size_flags_vertical = Control.SIZE_EXPAND_FILL
-	main_split.split_offset = 1040
+	main_split.split_offset = 1120
 	root.add_child(main_split)
 
 	var left_column = VBoxContainer.new()
@@ -335,13 +339,13 @@ func _build_ui() -> void:
 	left_column.add_child(_build_bottom_bar())
 
 	var shop_panel = _make_panel(false)
-	shop_panel.custom_minimum_size = Vector2(420, 0)
+	shop_panel.custom_minimum_size = Vector2(350, 0)
 	shop_panel.size_flags_vertical = Control.SIZE_EXPAND_FILL
 	main_split.add_child(shop_panel)
 	var shop_box = _make_panel_content(shop_panel)
 	shop_box.add_child(_make_section_title("Toy Shelf"))
 
-	var shop_hint = _make_body_label("Buy cats and cozy contraptions to make the mill busier and the song fuller.")
+	var shop_hint = _make_body_label("Buy toys that add cats, motion, and music.")
 	shop_hint.autowrap_mode = TextServer.AUTOWRAP_WORD_SMART
 	shop_box.add_child(shop_hint)
 	muted_label_nodes.append(shop_hint)
@@ -368,7 +372,7 @@ func _build_top_bar() -> Control:
 
 	title_label = Label.new()
 	title_label.text = "Melody Mill"
-	title_label.add_theme_font_size_override("font_size", 32)
+	title_label.add_theme_font_size_override("font_size", 28)
 	title_box.add_child(title_label)
 	label_nodes.append(title_label)
 
@@ -384,7 +388,7 @@ func _build_top_bar() -> Control:
 	top.add_child(harmony_label)
 
 	theme_option_button = OptionButton.new()
-	theme_option_button.custom_minimum_size = Vector2(190, 42)
+	theme_option_button.custom_minimum_size = Vector2(170, 36)
 	theme_option_button.item_selected.connect(_on_theme_selected)
 	top.add_child(theme_option_button)
 	button_nodes.append(theme_option_button)
@@ -423,6 +427,7 @@ func _build_bottom_bar() -> Control:
 	controls_panel.custom_minimum_size = Vector2(360, 0)
 	bottom.add_child(controls_panel)
 	var controls_box = _make_panel_content(controls_panel)
+	controls_box.add_theme_constant_override("separation", 6)
 
 	var button_row = HBoxContainer.new()
 	button_row.add_theme_constant_override("separation", 8)
@@ -430,6 +435,7 @@ func _build_bottom_bar() -> Control:
 
 	click_button = Button.new()
 	click_button.text = "Bat Yarn"
+	click_button.custom_minimum_size = Vector2(0, 46)
 	click_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	click_button.pressed.connect(_on_click_button_pressed)
 	button_row.add_child(click_button)
@@ -437,6 +443,7 @@ func _build_bottom_bar() -> Control:
 
 	prestige_button = Button.new()
 	prestige_button.text = "Spin"
+	prestige_button.custom_minimum_size = Vector2(0, 46)
 	prestige_button.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 	prestige_button.pressed.connect(_on_prestige_button_pressed)
 	button_row.add_child(prestige_button)
@@ -448,34 +455,6 @@ func _build_bottom_bar() -> Control:
 	music_toggle.toggled.connect(_on_music_toggled)
 	controls_box.add_child(music_toggle)
 	button_nodes.append(music_toggle)
-
-	for lane in AudioConductorScript.LANE_ORDER:
-		var row = HBoxContainer.new()
-		row.add_theme_constant_override("separation", 8)
-		controls_box.add_child(row)
-
-		var lane_label = _make_body_label(_lane_label(lane))
-		lane_label.custom_minimum_size = Vector2(82, 0)
-		row.add_child(lane_label)
-
-		var lane_bar = ProgressBar.new()
-		lane_bar.min_value = 0
-		lane_bar.max_value = 3
-		lane_bar.show_percentage = false
-		lane_bar.size_flags_horizontal = Control.SIZE_EXPAND_FILL
-		row.add_child(lane_bar)
-
-		var lane_slider = HSlider.new()
-		lane_slider.min_value = 0.0
-		lane_slider.max_value = 1.0
-		lane_slider.step = 0.01
-		lane_slider.value = 0.8
-		lane_slider.custom_minimum_size = Vector2(82, 0)
-		lane_slider.value_changed.connect(_on_lane_volume_changed.bind(lane))
-		row.add_child(lane_slider)
-
-		lane_bar_map[lane] = lane_bar
-		lane_slider_map[lane] = lane_slider
 
 	return bottom
 
@@ -559,17 +538,19 @@ func _refresh_theme() -> void:
 	for button_node in button_nodes:
 		if button_node is Button:
 			if button_node is CheckBox:
-				button_node.add_theme_stylebox_override("normal", _style_box(panel))
-				button_node.add_theme_stylebox_override("hover", _style_box(panel.lightened(0.04)))
-				button_node.add_theme_stylebox_override("pressed", _style_box(panel_alt))
+				button_node.add_theme_stylebox_override("normal", _button_style_box(panel, panel_alt.darkened(0.12), 0))
+				button_node.add_theme_stylebox_override("hover", _button_style_box(panel.lightened(0.04), accent, 0))
+				button_node.add_theme_stylebox_override("pressed", _button_style_box(panel_alt, accent, 0))
 				button_node.add_theme_color_override("font_color", text)
+				button_node.add_theme_font_size_override("font_size", 15)
 				continue
-			button_node.add_theme_stylebox_override("normal", _style_box(button))
-			button_node.add_theme_stylebox_override("hover", _style_box(button.lightened(0.08)))
-			button_node.add_theme_stylebox_override("pressed", _style_box(accent.darkened(0.08)))
-			button_node.add_theme_stylebox_override("disabled", _style_box(panel_alt.darkened(0.08)))
+			button_node.add_theme_stylebox_override("normal", _button_style_box(button, accent.darkened(0.08), 3))
+			button_node.add_theme_stylebox_override("hover", _button_style_box(button.lightened(0.08), accent, 4))
+			button_node.add_theme_stylebox_override("pressed", _button_style_box(accent, accent.darkened(0.22), 1))
+			button_node.add_theme_stylebox_override("disabled", _button_style_box(panel_alt.darkened(0.08), panel_alt.darkened(0.18), 0))
 			button_node.add_theme_color_override("font_color", button_text)
 			button_node.add_theme_color_override("font_disabled_color", muted)
+			button_node.add_theme_font_size_override("font_size", 15)
 	for label in label_nodes:
 		label.add_theme_color_override("font_color", text)
 	for label in muted_label_nodes:
@@ -609,7 +590,7 @@ func _rebuild_upgrade_list() -> void:
 		upgrade_panel.add_theme_constant_override("margin_bottom", 10)
 
 		var icon = ColorRect.new()
-		icon.custom_minimum_size = Vector2(42, 42)
+		icon.custom_minimum_size = Vector2(34, 34)
 		icon.color = _lane_color(String(upgrade.get("lane", "melody")))
 		row.add_child(icon)
 
@@ -622,7 +603,7 @@ func _rebuild_upgrade_list() -> void:
 		var owned = game_state.get_upgrade_count(current_mill_id, upgrade_id)
 		var cost = game_state.get_upgrade_cost(current_mill_id, upgrade_id)
 
-		var name_label = _make_value_label(16)
+		var name_label = _make_value_label(15)
 		name_label.text = "%s  x%s" % [game_state.get_upgrade_display_name(current_mill_id, upgrade_id), owned]
 		copy.add_child(name_label)
 
@@ -632,8 +613,8 @@ func _rebuild_upgrade_list() -> void:
 		muted_label_nodes.append(desc_label)
 
 		var buy_button = Button.new()
-		buy_button.text = "Buy\n%s" % game_state.format_number(cost)
-		buy_button.custom_minimum_size = Vector2(86, 46)
+		buy_button.text = "Buy %s" % game_state.format_number(cost)
+		buy_button.custom_minimum_size = Vector2(78, 40)
 		buy_button.disabled = not game_state.can_purchase_upgrade(current_mill_id, upgrade_id)
 		buy_button.pressed.connect(_on_upgrade_pressed.bind(upgrade_id))
 		row.add_child(buy_button)
@@ -722,10 +703,10 @@ func _make_panel_content(panel: PanelContainer) -> VBoxContainer:
 	var box = VBoxContainer.new()
 	box.add_theme_constant_override("separation", 8)
 	panel.add_child(box)
-	panel.add_theme_constant_override("margin_left", 12)
-	panel.add_theme_constant_override("margin_right", 12)
-	panel.add_theme_constant_override("margin_top", 12)
-	panel.add_theme_constant_override("margin_bottom", 12)
+	panel.add_theme_constant_override("margin_left", 10)
+	panel.add_theme_constant_override("margin_right", 10)
+	panel.add_theme_constant_override("margin_top", 10)
+	panel.add_theme_constant_override("margin_bottom", 10)
 	return box
 
 
@@ -774,6 +755,22 @@ func _style_box(color: Color) -> StyleBoxFlat:
 	style.content_margin_right = 10
 	style.content_margin_top = 10
 	style.content_margin_bottom = 10
+	return style
+
+
+func _button_style_box(color: Color, edge: Color, shadow_size: int) -> StyleBoxFlat:
+	var style = _style_box(color)
+	style.border_width_left = 2
+	style.border_width_right = 2
+	style.border_width_top = 2
+	style.border_width_bottom = 3
+	style.border_color = edge
+	style.shadow_size = shadow_size
+	style.shadow_color = Color(0, 0, 0, 0.12)
+	style.content_margin_left = 12
+	style.content_margin_right = 12
+	style.content_margin_top = 7
+	style.content_margin_bottom = 7
 	return style
 
 
