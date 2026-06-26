@@ -6,11 +6,11 @@
   "prestige_action_name": "Spin Into Harmony",
   "prestige_goal_resource": 80000,
   "stages": [
-    { "name": "Small Yarn Ball", "goal": 40 },
-    { "name": "Thick Yarn Ball", "goal": 250 },
-    { "name": "Giant Yarn Bundle", "goal": 1800 },
-    { "name": "Royal Yarn Sphere", "goal": 12000 },
-    { "name": "Cosmic Yarn Moon", "goal": 75000 }
+    { "name": "Starter Skein", "goal": 40 },
+    { "name": "Ribbon Bloom", "goal": 250 },
+    { "name": "Woven Rosette", "goal": 1800 },
+    { "name": "Harmony Crown", "goal": 12000 },
+    { "name": "Celestial Loomcore", "goal": 75000 }
   ],
   "upgrades": [
     {

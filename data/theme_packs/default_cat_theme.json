@@ -14,7 +14,18 @@
     "button": "#ffd27a",
     "button_text": "#3a2c28",
     "text": "#3a2c28",
-    "muted_text": "#6f5a52"
+    "muted_text": "#6f5a52",
+    "scene_sky_top": "#f6d9a6",
+    "scene_sky_bottom": "#fff4de",
+    "scene_sea": "#8fd4db",
+    "scene_sea_foam": "#eefcfb",
+    "scene_island_grass": "#8fb972",
+    "scene_island_sand": "#f0d7a4",
+    "scene_leaf": "#6d9751",
+    "scene_flower": "#ef8fb0",
+    "scene_yarn": "#ffc766",
+    "scene_cat_primary": "#ffd67b",
+    "scene_cat_secondary": "#f3a251"
   },
   "labels": {
     "mill_title": "Cat Mill",
