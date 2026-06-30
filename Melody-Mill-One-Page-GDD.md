@@ -1,14 +1,14 @@
 # Melody Mill - One-Page Game Design Doc
 
 ## High Concept
-**Melody Mill** is a musical idle game for Steam where players build themed production worlds that generate both resources and songs. Each world, or **Mill**, has its own main object, upgrade set, mechanic flavor, and instrument palette. On top of that, players can apply official or custom **Theme Packs** that change how the world looks and sounds. The core hook is simple: **click, automate, and compose a better song as the factory grows**.
+**Melody Mill** is a musical idle game for Steam where players build themed production worlds that generate both resources and songs. Each world, or **Mill**, has its own main object, upgrade set, mechanic flavor, and instrument palette. On top of that, players can apply official or custom **Theme Packs** that change how the world looks and sounds. The core hook is simple: **click on beat, automate, and compose a better song as the factory grows**.
 
 ## Player Fantasy
 The player is not just making numbers go up. They are building a living music machine where every purchase makes the world richer, busier, and more melodic.
 
 ## Core Pillars
 1. **Music as Reward**: every upgrade improves output and adds to the soundtrack.
-2. **Strong Idle Progression**: satisfying click feedback, clean upgrade pacing, and escalating stage goals.
+2. **Strong Idle Progression**: satisfying click feedback, timing bonuses, clean upgrade pacing, and escalating stage goals.
 3. **World Variety**: each Mill feels like a new album, not just a reskin.
 4. **Creative Expression**: players can customize how items look and sound without breaking progression.
 5. **Meaningful Prestige**: resets feed long-term growth through Harmony Points.
@@ -16,13 +16,14 @@ The player is not just making numbers go up. They are building a living music ma
 ## Core Loop
 1. Enter an unlocked Mill.
 2. Optionally apply a Theme Pack to change visuals, names, and sounds.
-3. Click the Mill's main object to harvest its local resource.
-4. Spend resources on Mill-specific upgrades that increase production.
-5. Upgrades automatically interact with the main object on timed loops.
-6. Each interaction adds a note, beat, chord, or texture layer.
-7. When the current object is fully harvested, a bigger stage version appears.
-8. Reach a prestige milestone and reset the Mill for Harmony Points.
-9. Spend Harmony Points on permanent upgrades, new Mills, and creative unlocks.
+3. Click the Mill's main object in time with the beat to harvest its local resource.
+4. Land well-timed clicks to earn bonus resource, combo energy, or stronger musical accents.
+5. Spend resources on Mill-specific upgrades that increase production.
+6. Upgrades automatically interact with the main object on timed loops.
+7. Each interaction adds a note, beat, chord, or texture layer.
+8. When the current object reaches a stage threshold, it transforms into a cooler form.
+9. Reach a prestige milestone and reset the Mill for Harmony Points.
+10. Spend Harmony Points on permanent upgrades, new Mills, and creative unlocks.
 
 ## Game Structure
 The game should clearly separate progression systems from customization systems. Player-facing progression is organized around **Islands**: each Island is a themed gameplay world with its own Mill, resource fantasy, upgrade cast, art direction, and music identity.
@@ -57,6 +58,7 @@ Each Mill should be built from the same gameplay skeleton, but have its own flav
 
 ### Every Mill Includes
 - one central clickable object
+- one visible rhythm guide, such as a beat lane or beat ring
 - 8-10 themed upgrades
 - 4 musical lanes
 - a unique instrument palette
@@ -67,7 +69,7 @@ Each Mill should be built from the same gameplay skeleton, but have its own flav
 ### Mill Examples
 | Mill | Main Object | Visual Tone | Sound Palette | Twist |
 |---|---|---|---|---|
-| Cat Mill | Yarn Ball | Cozy and playful | Bells, plucks, purr-like pads | Bouncy timing and playful swats |
+| Cat Mill | Yarn Ball | Cozy and playful | Bells, plucks, purr-like pads | Bouncy timing windows and playful swats |
 | Robot Mill | Power Core | Clean and mechanical | Synth arps, metallic percussion, bass pulses | Precision boosts from perfect sync |
 | Spooky Mill | Haunted Orb | Eerie and whimsical | Music box, choir, ghostly FX | Slow build into dramatic crescendos |
 | Ocean Mill | Coral Pearl | Calm and fluid | Marimba, water percussion, airy pads | Gentle wave timing that shifts patterns |
@@ -76,11 +78,11 @@ Each Mill should be built from the same gameplay skeleton, but have its own flav
 Version 1 should launch with **Cat Island** and **Cat Mill** as the flagship Island/Mill pair.
 
 ### Cat Mill Stage Examples
-- Small Yarn Ball
-- Thick Yarn Ball
-- Giant Yarn Bundle
-- Royal Yarn Sphere
-- Cosmic Yarn Moon
+- Starter Skein
+- Ribbon Bloom
+- Woven Rosette
+- Harmony Crown
+- Celestial Loomcore
 
 ### Cat Mill Upgrade Examples
 | Upgrade | Gameplay Role | Musical Role |
@@ -97,9 +99,17 @@ Version 1 should launch with **Cat Island** and **Cat Mill** as the flagship Isl
 ## Music System
 The audio must sound good even when players buy upgrades in a messy order.
 
+### Rhythm Interaction Rule
+- The main object should sit at the center of a visible rhythm guide.
+- In Cat Mill, the yarn should sit directly in the middle of the beat action.
+- Manual clicks should feel best when timed to the beat, not spammed randomly.
+- Off-beat clicks should still work, but on-beat clicks should give a noticeable reward bump.
+- Auto-hits from upgrades should also lock to the same musical timing rules.
+
 ### Rules for the System
 - All notes stay in a fixed key and scale.
 - All hits are quantized to a beat grid.
+- The player should be able to visually read where the next strong beat is coming from.
 - Each upgrade family has a musical lane:
   - light units = melody
   - support/buildings = percussion or texture
@@ -111,6 +121,21 @@ The audio must sound good even when players buy upgrades in a messy order.
 
 ### Audio Goal
 The player should feel like they are gradually assembling a song, not creating random noise.
+
+## Screen Composition Direction
+The default camera should move toward a **semi-top-down cozy board-game view**, not a flat side view and not a fully overhead map.
+
+### Layout Intent
+- the main object sits exactly at screen center
+- a beat lane or beat ring crosses through that center point
+- performers and progression props build outward around the center
+- the shop stays separate as a compact crafted shelf, not mixed into the center play area
+
+### Why This Direction Fits Melody Mill
+- it makes the rhythm mechanic readable at a glance
+- it preserves the yarn as the clear hero
+- it lets progression spread around the center in a satisfying way
+- it keeps the world cozy instead of clinical
 
 ## Prestige and Harmony
 Melody Mill should have a prestige system, but it should feel musical rather than generic.
@@ -221,7 +246,9 @@ This keeps the game expandable without requiring every theme on day one.
 ## Immediate Next Step
 Prototype a single screen with:
 - Cat Mill only
-- clickable yarn
+- yarn placed dead center
+- a visible beat guide through or around the yarn
+- clickable yarn with on-beat bonus reward
 - 3 upgrades
 - 1 looping beat
 - upgrades triggering notes on a fixed rhythm

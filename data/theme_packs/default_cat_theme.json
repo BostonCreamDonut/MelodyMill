@@ -33,5 +33,29 @@
     "click_action_name": "Bat the Yarn",
     "prestige_action_name": "Spin Into Harmony"
   },
+  "scene_assets": {
+    "background": "res://assets/cat_mill/backgrounds/cozy_island_topdown_v1.png",
+    "shelf_header": "res://assets/cat_mill/ui/toy_shelf_topper_v2.png",
+    "centerpiece_stages": [
+      "res://assets/cat_mill/centerpieces/starter_skein_v2.png",
+      "res://assets/cat_mill/centerpieces/ribbon_bloom_v2.png",
+      "res://assets/cat_mill/centerpieces/woven_rosette_v2.png",
+      "res://assets/cat_mill/centerpieces/harmony_crown_v2.png",
+      "res://assets/cat_mill/centerpieces/celestial_loomcore_v2.png"
+    ],
+    "cat_variants": [
+      "res://assets/cat_mill/cats/kitten_topdown_v1.png",
+      "res://assets/cat_mill/cats/house_cat_topdown_v1.png"
+    ]
+  },
+  "upgrade_icons": {
+    "kitten": "res://assets/cat_mill/cats/kitten_performer_v2.png",
+    "house_cat": "res://assets/cat_mill/cats/house_cat_performer_v2.png",
+    "scratching_post": "res://assets/cat_mill/upgrade_icons/scratching_post_v1.png",
+    "yarn_basket": "res://assets/cat_mill/upgrade_icons/yarn_basket_v1.png",
+    "cat_tower": "res://assets/cat_mill/upgrade_icons/cat_tower_v1.png",
+    "cat_choir": "res://assets/cat_mill/upgrade_icons/cat_choir_v1.png",
+    "grand_meowstro": "res://assets/cat_mill/upgrade_icons/grand_meowstro_v1.png"
+  },
   "upgrade_name_overrides": {}
 }

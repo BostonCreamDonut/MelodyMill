@@ -5,6 +5,7 @@ This repository now contains the first playable **Godot 4** prototype scaffold f
 ## Current Scope
 - `Cat Mill` vertical slice
 - click-to-gain yarn loop
+- planned rhythm-timed click bonus around a centered yarn focal point
 - upgrade purchasing
 - yarn stage progression
 - `Spin Into Harmony` prestige reset
@@ -18,8 +19,16 @@ This repository now contains the first playable **Godot 4** prototype scaffold f
 2. Open the project at the repository root.
 3. Run the main scene.
 
+## Planning Docs
+- [Melody-Mill-One-Page-GDD.md](Melody-Mill-One-Page-GDD.md)
+- [Melody-Mill-Progression-and-Economy.md](Melody-Mill-Progression-and-Economy.md)
+- [Melody-Mill-Audio-System-and-Music-Rules.md](Melody-Mill-Audio-System-and-Music-Rules.md)
+- [Melody-Mill-Theme-Pack-Format.md](Melody-Mill-Theme-Pack-Format.md)
+- [Melody-Mill-Visual-Vertical-Slice-Plan.md](Melody-Mill-Visual-Vertical-Slice-Plan.md)
+
 ## Prototype Notes
 - The UI is built entirely from code so the prototype can evolve quickly.
 - Audio uses generated tones instead of final assets.
 - Theme Packs currently swap colors, labels, and upgrade display names.
+- The current target layout is a semi-top-down cozy island with the yarn at dead center and a visible beat guide.
 - The project is structured so local Theme Packs can later grow into Steam Workshop content.
