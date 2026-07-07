@@ -137,6 +137,43 @@ The default camera should move toward a **semi-top-down cozy board-game view**, 
 - it lets progression spread around the center in a satisfying way
 - it keeps the world cozy instead of clinical
 
+## Cat Mill World Structure
+Cat Mill should be designed as **one giant mill unit**, not a central yarn plus unrelated item placements.
+
+### Structure Rule
+- define one full mill silhouette first
+- reserve the center lane for the yarn and beat timing game
+- attach a few permanent build zones around the outside of that mill
+- make purchases complete or enrich those same attached sections over time
+
+### Cat Mill Build Zones
+- `Center Core`: yarn ball and beat staff only
+- `Main Mill Body`: the dominant circular workshop wrapped around the center
+- `North Melody Wing`: attached melody nook on the upper arc
+- `Northwest Percussion Wing`: attached tapping and scratching wing on the upper-left arc
+- `Northeast Texture Wing`: attached basket and fiber wing on the upper-right arc
+- `South Mill Works`: the largest lower structure for late-game expansion
+
+### Upgrade Assignment
+- `Kitten` -> `North Melody Wing`
+- `House Cat` -> `North Melody Wing`
+- `Scratching Post` -> `Northwest Percussion Wing`
+- `Yarn Basket` -> `Northeast Texture Wing`
+- `Cat Choir` -> `Northeast Texture Wing`
+- `Cat Tower` -> `South Mill Works`
+- `Grand Meowstro` -> `South Mill Works`
+
+### Progression Rule
+Repeat purchases should enrich an existing section rather than spawning new disconnected placements.
+
+That means a section should gain:
+- missing roof pieces
+- lofts, storage, perches, and trim
+- stronger silhouettes on the outside ring
+- clearer musical identity without blocking the center lane
+
+This should make Cat Mill feel like a real music mill being assembled, not a board where tokens are being dropped.
+
 ## Prestige and Harmony
 Melody Mill should have a prestige system, but it should feel musical rather than generic.
 

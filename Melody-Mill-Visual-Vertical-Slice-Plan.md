@@ -119,6 +119,75 @@ The vertical slice should reorganize the screen around a rhythm-first center.
 - late game should feel like the island became a complete living arrangement
 - progression should change the composition around the center, not just inflate one object
 
+## Connected Mill Rule
+Before polishing individual placements further, the Cat Mill should be treated as **one connected mill design**.
+
+That means:
+- define the whole mill silhouette first
+- divide it into a few permanent build zones
+- assign upgrades to those zones
+- let repeat purchases enrich the same zone instead of spawning unrelated new markers
+
+The player should feel:
+- the mill is being built out
+- each purchase adds to an existing workshop area
+- the island is becoming a real music machine
+
+Not:
+- icons are being scattered around a board
+
+## Cat Mill Structure Plan
+The Cat Mill should read like **one giant mill unit** first, with purchases adding missing pieces around that same unit.
+
+### Core Layout
+- `Center Core`: yarn and musical staff lane only
+- `Main Mill Body`: one dominant circular mill structure wrapping the center play space
+- `North Melody Wing`: small melody add-on attached to the top arc
+- `Northwest Percussion Wing`: tapping/scratching add-on attached off the upper-left arc
+- `Northeast Texture Wing`: basket/fiber add-on attached off the upper-right arc
+- `South Mill Works`: the largest late-game mill structure attached below the circle
+
+### Build Zones And Upgrade Ownership
+- `North Melody Wing`
+  - `Kitten`
+  - `House Cat`
+- `Northwest Percussion Wing`
+  - `Scratching Post`
+- `Northeast Texture Wing`
+  - `Yarn Basket`
+  - `Cat Choir`
+- `South Mill Works`
+  - `Cat Tower`
+  - `Grand Meowstro`
+
+### Zone Behavior
+- The center row must stay visually open for the beat timing game.
+- Upgrades should not occupy the center timing lane.
+- Each owned upgrade should feel like a missing structural part was attached to the giant mill.
+- Small upgrades should add trim, lofts, perches, storage, or tiny work areas.
+- Large upgrades should expand the silhouette of the main mill body rather than create detached scenes.
+
+### Repeat Purchase Rule
+Repeat purchases should not create random new pads.
+
+Instead, repeats should:
+- add more props inside that upgrade's home zone
+- improve trim, detail, and density
+- make the zone feel more active or more established
+
+Examples:
+- more `Kitten` purchases add trim, perches, and little play details to the `North Melody Wing`
+- more `Scratching Post` purchases add wood taps and scratch posts to the `Northwest Percussion Wing`
+- more `Yarn Basket` purchases add bundled storage and woven trim to the `Northeast Texture Wing`
+- more `Cat Tower` purchases make the `South Mill Works` taller, broader, and more built out
+- more `Grand Meowstro` purchases should enrich one special conductor area, not duplicate capstone monuments everywhere
+
+### Visual Goal
+By late game, the player should be able to read the whole Cat Mill as:
+- one big mill wrapped around the central play lane
+- several attached toy-like mill parts around the outside
+- one clean readable timing space through the middle
+
 ### Shop Separation
 - the Toy Shelf remains a compact right-side UI rack
 - the shelf sells and previews items
@@ -252,7 +321,8 @@ Build in this order so improvements stack correctly.
 - finalize top bar
 - finalize bottom status area
 - finalize compact right-side toy shelf
-- place upgrade world objects around the center by lane and progression role
+- define permanent Cat Mill build zones
+- place upgrades inside those zones by role and progression stage
 
 ### Phase 4: Add Motion Pass
 - click bounce

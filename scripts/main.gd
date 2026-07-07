@@ -182,6 +182,8 @@ class ToyboxMillScene:
 	var centerpiece_asset_paths: PackedStringArray = []
 	var cat_asset_paths: PackedStringArray = []
 	var upgrade_order: PackedStringArray = []
+	var upgrade_lanes: Dictionary = {}
+	var upgrade_types: Dictionary = {}
 	var upgrade_icon_paths: Dictionary = {}
 	var background_texture: Texture2D
 	var centerpiece_textures: Array = []
@@ -210,6 +212,8 @@ class ToyboxMillScene:
 		lane_intensities = data.get("lane_intensities", {})
 		owned_upgrades = data.get("owned_upgrades", {})
 		upgrade_order = PackedStringArray(data.get("upgrade_order", []))
+		upgrade_lanes = data.get("upgrade_lanes", {})
+		upgrade_types = data.get("upgrade_types", {})
 		_set_upgrade_icons(data.get("upgrade_icons", {}))
 		_set_scene_assets(data.get("scene_assets", {}))
 		queue_redraw()
@@ -346,47 +350,123 @@ class ToyboxMillScene:
 			draw_line(Vector2(x + 6, y), Vector2(x + 6, y - 32), note_color, 3.0)
 
 	func _draw_cats(text: Color, cat_primary: Color, cat_secondary: Color) -> void:
-		var cat_count = clamp(_owned_total(), 0, 9)
-		for i in cat_count:
-			var anchor = _cat_anchor(i, cat_count)
+		var performers = _build_performer_layout()
+		for i in performers.size():
+			var performer: Dictionary = performers[i]
+			var anchor = performer.get("anchor", _yarn_center()) as Vector2
 			var x = anchor.x
-			var y = anchor.y + sin(pulse * 2.2 + i * 0.75) * 3.2
-			var scale = 0.48 + (i % 3) * 0.05
+			var motion = performer.get("motion", 0.0) as float
+			var zone = String(performer.get("zone", "melody"))
+			var base_y = anchor.y + sin(pulse * (1.8 + motion * 0.25) + i * 0.7) * (2.0 + motion * 0.35)
+			var scale = performer.get("scale", 0.48) as float
 			if not cat_textures.is_empty():
-				var cat_texture = cat_textures[i % cat_textures.size()] as Texture2D
+				var texture_index = int(performer.get("texture_index", i % cat_textures.size())) % max(1, cat_textures.size())
+				var cat_texture = cat_textures[texture_index] as Texture2D
 				if cat_texture != null:
-					var width = 96.0 * scale
-					var height = 96.0 * scale
-					if i % cat_textures.size() == 1:
-						width = 104.0 * scale
-						height = 104.0 * scale
+					var width = 92.0 * scale
+					var height = 92.0 * scale
+					if texture_index == 1:
+						width = 98.0 * scale
+						height = 98.0 * scale
 					var shadow_color = Color(0, 0, 0, 0.11)
-					draw_circle(Vector2(x, y + height * 0.22), width * 0.22, shadow_color)
-					var art_rect = Rect2(Vector2(x - width * 0.5, y - height * 0.56), Vector2(width, height))
+					draw_circle(Vector2(x, base_y + height * 0.22), width * 0.20, shadow_color)
+					var art_rect = Rect2(Vector2(x - width * 0.5, base_y - height * 0.56), Vector2(width, height))
 					draw_texture_rect(cat_texture, art_rect, false)
 					continue
 			var body = cat_primary if i % 2 == 0 else cat_secondary
-			_draw_cat(Vector2(x, y), scale, body, text)
+			_draw_cat(Vector2(x, base_y), scale, body, text)
 
-	func _cat_anchor(index: int, total: int) -> Vector2:
-		var center = _yarn_center()
-		var ring = Vector2(_yarn_radius() * 1.86, _yarn_radius() * 1.42)
-		var normalized_anchors = [
-			Vector2(-0.52, -0.42),
-			Vector2(0.52, -0.42),
-			Vector2(0.70, 0.02),
-			Vector2(0.46, 0.44),
-			Vector2(-0.46, 0.44),
-			Vector2(-0.70, 0.02),
-			Vector2(0.00, -0.58),
-			Vector2(0.00, 0.58),
-			Vector2(-0.24, -0.60)
-		]
-		if total <= normalized_anchors.size():
-			var normalized = normalized_anchors[index]
-			return center + Vector2(normalized.x * ring.x, normalized.y * ring.y)
-		var angle = -PI / 2.0 + TAU * float(index) / max(1.0, float(total))
-		return center + Vector2(cos(angle) * ring.x, sin(angle) * ring.y)
+	func _build_performer_layout() -> Array:
+		var performers: Array = []
+		var melody_anchor = _zone_anchor(Vector2(0.0, -1.24))
+		var percussion_anchor = _zone_anchor(Vector2(-1.10, -0.52))
+		var texture_anchor = _zone_anchor(Vector2(1.10, -0.48))
+		var bass_anchor = _zone_anchor(Vector2(0.0, 1.18))
+		var kitten_count = mini(_upgrade_count("kitten"), 4)
+		var house_cat_count = mini(_upgrade_count("house_cat"), 3)
+		var scratching_post_count = mini(_upgrade_count("scratching_post"), 2)
+		var yarn_basket_count = mini(_upgrade_count("yarn_basket"), 1)
+		var cat_choir_count = mini(_upgrade_count("cat_choir"), 2)
+		var cat_tower_count = mini(_upgrade_count("cat_tower"), 2)
+		var grand_meowstro_count = mini(_upgrade_count("grand_meowstro"), 1)
+		var total_owned = _owned_total()
+		for slot in _zone_slots(melody_anchor, "melody", kitten_count + house_cat_count):
+			var entry: Dictionary = slot
+			var slot_index = int(entry.get("slot_index", 0))
+			entry["texture_index"] = 1 if slot_index >= kitten_count and house_cat_count > 0 else 0
+			entry["scale"] = 0.44 if slot_index < kitten_count else 0.50
+			entry["motion"] = 1.4 + slot_index * 0.2
+			performers.append(entry)
+		for slot in _zone_slots(percussion_anchor, "percussion", scratching_post_count):
+			var entry: Dictionary = slot
+			entry["texture_index"] = 0
+			entry["scale"] = 0.42
+			entry["motion"] = 1.9
+			performers.append(entry)
+		for slot in _zone_slots(texture_anchor, "texture", yarn_basket_count + cat_choir_count):
+			var entry: Dictionary = slot
+			entry["texture_index"] = 1 if int(entry.get("slot_index", 0)) >= yarn_basket_count and cat_choir_count > 0 else 0
+			entry["scale"] = 0.43
+			entry["motion"] = 1.1
+			performers.append(entry)
+		for slot in _zone_slots(bass_anchor, "bass", cat_tower_count + grand_meowstro_count):
+			var entry: Dictionary = slot
+			entry["texture_index"] = 1 if int(entry.get("slot_index", 0)) >= cat_tower_count and grand_meowstro_count > 0 else 0
+			entry["scale"] = 0.46 if int(entry.get("slot_index", 0)) < cat_tower_count else 0.52
+			entry["motion"] = 0.9
+			performers.append(entry)
+		if performers.is_empty() and total_owned > 0:
+			performers.append({
+				"anchor": melody_anchor + Vector2(0, 8),
+				"zone": "melody",
+				"texture_index": 0,
+				"scale": 0.44,
+				"motion": 1.2,
+				"slot_index": 0
+			})
+		return performers
+
+	func _zone_slots(anchor: Vector2, zone: String, count: int) -> Array:
+		var slots: Array = []
+		if count <= 0:
+			return slots
+		var offsets: Array = []
+		match zone:
+			"melody":
+				offsets = [
+					Vector2(-16, 16),
+					Vector2(16, 16),
+					Vector2(-5, 26),
+					Vector2(8, 26),
+					Vector2(0, 6)
+				]
+			"percussion":
+				offsets = [
+					Vector2(-11, 14),
+					Vector2(10, 18),
+					Vector2(0, 6)
+				]
+			"texture":
+				offsets = [
+					Vector2(-10, 16),
+					Vector2(12, 16),
+					Vector2(0, 6)
+				]
+			"bass":
+				offsets = [
+					Vector2(-20, 12),
+					Vector2(18, 10),
+					Vector2(0, 22)
+				]
+			_:
+				offsets = [Vector2.ZERO]
+		for slot_index in range(mini(count, offsets.size())):
+			slots.append({
+				"anchor": anchor + offsets[slot_index],
+				"zone": zone,
+				"slot_index": slot_index
+			})
+		return slots
 
 	func _draw_cat(center: Vector2, scale: float, body: Color, ink: Color) -> void:
 		var s = 34.0 * scale
@@ -444,6 +524,30 @@ class ToyboxMillScene:
 		var r = radius * (1.0 + yarn_bump * 0.06)
 		var yarn = yarn_base
 		var detail_level = mini(stage_index, 4)
+		var sand = Color(palette.get("scene_island_sand", "#f0d7a4"))
+		var grass = Color(palette.get("scene_island_grass", "#8fb972"))
+		var wood = sand.lerp(accent, 0.22)
+		var nest_center = center + Vector2(0, r * 0.44)
+		var nest_shadow = wood.darkened(0.54)
+		nest_shadow.a = 0.12
+		draw_circle(nest_center + Vector2(0, 7), r * 0.90, nest_shadow)
+		draw_circle(nest_center, r * 0.80, grass.lerp(sand, 0.40).darkened(0.02))
+		draw_circle(nest_center, r * 0.64, sand.lightened(0.08))
+		for weave_index in range(8):
+			var weave_angle = pulse * 0.10 + weave_index * TAU / 8.0
+			var weave_center = nest_center + Vector2(cos(weave_angle), sin(weave_angle)) * (r * 0.48)
+			draw_circle(weave_center, r * 0.08, wood.lightened(0.02))
+		draw_arc(nest_center, r * 0.72, 0.0, TAU, 48, wood.darkened(0.16), 4.0)
+		for peg_index in range(4):
+			var peg_angle = -PI / 4.0 + peg_index * TAU / 4.0
+			var peg_center = center + Vector2(cos(peg_angle), sin(peg_angle)) * (r * 1.04)
+			draw_circle(peg_center, r * 0.09, wood.darkened(0.08))
+			draw_circle(peg_center + Vector2(0, -r * 0.03), r * 0.06, sand.lightened(0.10))
+		for thread_index in range(3):
+			var thread_angle = -1.3 + thread_index * 0.54 + sin(pulse * 0.4 + thread_index) * 0.05
+			var thread_start = center + Vector2(cos(thread_angle), sin(thread_angle)) * (r * 0.92)
+			var thread_end = center + Vector2(cos(thread_angle + 0.42), sin(thread_angle + 0.42)) * (r * (1.20 + thread_index * 0.06))
+			draw_line(thread_start, thread_end, yarn.lightened(0.12), 2.2)
 		if beat_flash > 0.0:
 			var beat_glow = accent.lightened(0.26)
 			beat_glow.a = 0.06 + beat_flash * 0.16
@@ -518,7 +622,7 @@ class ToyboxMillScene:
 		return Vector2(size.x * 0.50, size.y * 0.50)
 
 	func _yarn_radius() -> float:
-		return min(size.x, size.y) * 0.16
+		return min(size.x, size.y) * 0.145
 
 	func _seconds_per_beat() -> float:
 		return 60.0 / max(1.0, bpm)
@@ -554,23 +658,26 @@ class ToyboxMillScene:
 
 	func _draw_beat_lane(accent: Color, panel: Color, muted: Color) -> void:
 		var center = _yarn_center()
-		var lane_half = _yarn_radius() * 2.45
+		var lane_half = _yarn_radius() * 2.75
 		var lane_start = center + Vector2(-lane_half, 0)
 		var lane_end = center + Vector2(lane_half, 0)
 		var phase = _beat_progress()
 		var beat_hit = pow(max(0.0, 1.0 - (_beat_distance() / 0.14)), 2.4)
-		var beat_color = accent.lightened(0.08)
-		beat_color.a = 0.24
-		draw_line(lane_start, lane_end, beat_color, 4.0)
-		draw_line(lane_start + Vector2(0, -15), lane_end + Vector2(0, -15), Color(1, 1, 1, 0.07), 1.2)
-		draw_line(lane_start + Vector2(0, 15), lane_end + Vector2(0, 15), Color(0, 0, 0, 0.05), 1.2)
+		var line_spacing = 8.0
+		var staff_color = accent.lightened(0.05)
+		staff_color.a = 0.18
+		for line_index in range(5):
+			var line_y = center.y + (line_index - 2) * line_spacing
+			draw_line(Vector2(lane_start.x, line_y), Vector2(lane_end.x, line_y), staff_color, 1.8)
+		var bar_color = accent.darkened(0.08)
+		bar_color.a = 0.42
 		for peg_center in [lane_start, lane_end]:
-			draw_circle(peg_center, 11.0, panel.darkened(0.10))
-			draw_circle(peg_center, 8.0, accent.lightened(0.10))
+			draw_line(peg_center + Vector2(0, -line_spacing * 2.5), peg_center + Vector2(0, line_spacing * 2.5), bar_color, 3.0)
+			draw_circle(peg_center + Vector2(0, line_spacing * 2.8), 7.0, panel.darkened(0.10))
 		for marker in [-0.66, -0.33, 0.33, 0.66]:
 			var marker_center = center + Vector2(lane_half * marker, 0)
-			var marker_color = Color(1, 1, 1, 0.09 + beat_hit * 0.06)
-			draw_circle(marker_center, 4.5 + beat_hit * 0.6, marker_color)
+			var marker_color = Color(1, 1, 1, 0.08 + beat_hit * 0.04)
+			draw_line(marker_center + Vector2(0, -line_spacing * 1.6), marker_center + Vector2(0, line_spacing * 1.6), marker_color, 1.4)
 		var center_glow = accent.lightened(0.24)
 		center_glow.a = 0.16 + beat_flash * 0.10 + beat_hit * 0.12
 		draw_circle(center, _yarn_radius() * (0.30 + beat_hit * 0.06), center_glow)
@@ -578,81 +685,363 @@ class ToyboxMillScene:
 			var ripple = accent.lightened(0.18)
 			ripple.a = 0.10 * beat_hit
 			draw_arc(center, _yarn_radius() * (0.84 + beat_hit * 0.34), 0.0, TAU, 56, ripple, 3.0)
+		var center_bar_color = accent.lightened(0.12)
+		center_bar_color.a = 0.30 + beat_hit * 0.12
+		draw_line(center + Vector2(-5, -line_spacing * 2.4), center + Vector2(-5, line_spacing * 2.4), center_bar_color, 2.2)
+		draw_line(center + Vector2(5, -line_spacing * 2.4), center + Vector2(5, line_spacing * 2.4), center_bar_color, 4.0)
+		if beat_hit > 0.12:
+			var flash = accent.lightened(0.22)
+			flash.a = beat_hit * 0.24
+			draw_rect(
+				Rect2(
+					center + Vector2(-_yarn_radius() * 0.64, -line_spacing * 2.8),
+					Vector2(_yarn_radius() * 1.28, line_spacing * 5.6)
+				),
+				flash
+			)
+			for accent_index in range(4):
+				var sweep = lerp(-line_spacing * 1.5, line_spacing * 1.5, float(accent_index) / 3.0)
+				var flare_start = center + Vector2(-_yarn_radius() * (1.00 + beat_hit * 0.25), sweep)
+				var flare_end = center + Vector2(_yarn_radius() * (1.00 + beat_hit * 0.25), sweep)
+				draw_line(flare_start, flare_end, Color(1, 1, 1, 0.05 + beat_hit * 0.08), 1.2)
 		for i in range(4):
 			var offset = fposmod(phase + float(i) / 4.0, 1.0)
 			var left_x = lerp(lane_start.x, center.x - _yarn_radius() * 0.34, offset)
 			var right_x = lerp(lane_end.x, center.x + _yarn_radius() * 0.34, offset)
-			var pulse_radius = 7.0 + (1.0 - offset) * 4.6
+			var line_offset = float(((i * 2) % 5) - 2) * line_spacing * 0.64
+			var pulse_radius = 6.8 + (1.0 - offset) * 3.6
 			var pulse_color = accent.lightened(0.10)
-			pulse_color.a = 0.18 + (1.0 - offset) * 0.28
-			_draw_lane_pulse(Vector2(left_x, center.y), -1.0, pulse_radius, pulse_color, offset)
-			_draw_lane_pulse(Vector2(right_x, center.y), 1.0, pulse_radius, pulse_color, offset)
+			pulse_color.a = 0.18 + (1.0 - offset) * 0.24
+			_draw_lane_pulse(Vector2(left_x, center.y + line_offset), -1.0, pulse_radius, pulse_color, offset)
+			_draw_lane_pulse(Vector2(right_x, center.y - line_offset), 1.0, pulse_radius, pulse_color, offset)
 		var perfect_window = accent.lightened(0.20)
 		perfect_window.a = 0.12 + beat_hit * 0.05
 		draw_circle(center, _yarn_radius() * (0.56 + beat_hit * 0.02), perfect_window)
+		if beat_hit > 0.45:
+			_draw_center_note_burst(center, accent, beat_hit)
 		draw_string(get_theme_default_font(), Vector2(center.x - 48, center.y - _yarn_radius() - 28), "Beat Window", HORIZONTAL_ALIGNMENT_LEFT, 120, 14, muted)
 
 	func _draw_lane_pulse(center_point: Vector2, direction: float, radius: float, color: Color, offset: float) -> void:
 		var glow = color
-		glow.a *= 0.42
-		draw_circle(center_point, radius * 1.55, glow)
-		draw_circle(center_point, radius, color)
-		draw_circle(center_point, radius * 0.34, Color(1, 1, 1, min(0.32, color.a + 0.08)))
+		glow.a *= 0.34
+		draw_circle(center_point, radius * 1.22, glow)
+		draw_circle(center_point + Vector2(0, 1.0), radius * 0.84, color)
+		var highlight = Color(1, 1, 1, min(0.28, color.a + 0.06))
+		draw_circle(center_point + Vector2(-radius * 0.10, -radius * 0.10), radius * 0.26, highlight)
+		var stem_color = color
+		stem_color.a *= 0.92
+		var stem_direction = -1.0 if center_point.y <= _yarn_center().y else 1.0
+		draw_line(
+			center_point + Vector2(radius * 0.62, 0),
+			center_point + Vector2(radius * 0.62, stem_direction * (radius * 2.3)),
+			stem_color,
+			1.8
+		)
 		for trail_index in range(2):
-			var trail_scale = 0.60 - trail_index * 0.18
-			var trail_offset = 16.0 + trail_index * 12.0
+			var trail_scale = 0.54 - trail_index * 0.18
+			var trail_offset = 18.0 + trail_index * 14.0
 			var trail_center = center_point + Vector2(direction * trail_offset * (1.0 - offset), 0)
 			var trail_color = color
-			trail_color.a *= 0.32 - trail_index * 0.10
+			trail_color.a *= 0.24 - trail_index * 0.08
 			draw_circle(trail_center, radius * trail_scale, trail_color)
 
+	func _draw_center_note_burst(center: Vector2, accent: Color, beat_hit: float) -> void:
+		var burst_color = accent.lightened(0.26)
+		burst_color.a = 0.20 * beat_hit
+		for i in range(6):
+			var angle = -PI / 2.0 + TAU * float(i) / 6.0
+			var start = center + Vector2(cos(angle), sin(angle)) * (_yarn_radius() * 0.62)
+			var tip = center + Vector2(cos(angle), sin(angle)) * (_yarn_radius() * (0.98 + beat_hit * 0.12))
+			draw_line(start, tip, burst_color, 2.0)
+		for i in range(3):
+			var note_center = center + Vector2((-1 + i) * (_yarn_radius() * 0.40), -_yarn_radius() * (0.88 + i * 0.08))
+			draw_circle(note_center, 4.0 + beat_hit * 1.4, burst_color)
+			draw_line(note_center + Vector2(4.0, 0), note_center + Vector2(4.0, -11.0 - beat_hit * 3.0), burst_color, 1.6)
+
 	func _draw_progression_props(panel: Color, panel_alt: Color, accent: Color, ink: Color) -> void:
-		var visible_upgrades: Array = []
-		for upgrade_id in upgrade_order:
-			var count = int(owned_upgrades.get(String(upgrade_id), 0))
-			if count > 0:
-				visible_upgrades.append({"id": String(upgrade_id), "count": count})
-		if visible_upgrades.is_empty():
+		var kitten_count = _upgrade_count("kitten")
+		var house_cat_count = _upgrade_count("house_cat")
+		var scratching_post_count = _upgrade_count("scratching_post")
+		var yarn_basket_count = _upgrade_count("yarn_basket")
+		var cat_choir_count = _upgrade_count("cat_choir")
+		var cat_tower_count = _upgrade_count("cat_tower")
+		var grand_meowstro_count = _upgrade_count("grand_meowstro")
+		var melody_total = kitten_count + house_cat_count
+		var texture_total = yarn_basket_count + cat_choir_count
+		var bass_total = cat_tower_count + grand_meowstro_count
+		var total_owned = melody_total + scratching_post_count + texture_total + bass_total
+		if total_owned <= 0:
 			return
 		var center = _yarn_center()
-		for i in visible_upgrades.size():
-			var entry: Dictionary = visible_upgrades[i]
-			var anchor = _progression_anchor(i, visible_upgrades.size())
-			draw_circle(anchor + Vector2(0, 16), 20.0, Color(0, 0, 0, 0.08))
-			draw_circle(anchor, 23.0, panel.lightened(0.03))
-			draw_circle(anchor, 20.0, panel_alt.lightened(0.03))
-			draw_arc(anchor, 22.0, 0.0, TAU, 24, accent.darkened(0.08), 1.4)
-			var icon_texture = upgrade_icon_textures.get(String(entry.get("id", ""))) as Texture2D
-			if icon_texture != null:
-				draw_texture_rect(icon_texture, Rect2(anchor - Vector2(16, 16), Vector2(32, 32)), false)
-			else:
-				draw_circle(anchor, 9.0, accent)
-			var count = int(entry.get("count", 0))
-			if count > 1:
-				var badge_center = anchor + Vector2(14, -14)
-				draw_circle(badge_center, 10.0, accent.darkened(0.04))
-				draw_string(get_theme_default_font(), badge_center + Vector2(-5, 5), str(count), HORIZONTAL_ALIGNMENT_LEFT, 14, 12, ink)
+		var sand = Color(palette.get("scene_island_sand", "#f0d7a4"))
+		var wood = sand.lerp(accent, 0.22)
+		var highlight = sand.lightened(0.12)
+		var melody_anchor = _zone_anchor(Vector2(0.0, -1.24))
+		var percussion_anchor = _zone_anchor(Vector2(-1.10, -0.52))
+		var texture_anchor = _zone_anchor(Vector2(1.10, -0.48))
+		var bass_anchor = _zone_anchor(Vector2(0.0, 1.18))
+		_draw_mill_foundations(
+			center,
+			melody_anchor,
+			percussion_anchor,
+			texture_anchor,
+			bass_anchor,
+			sand,
+			wood,
+			accent,
+			melody_total,
+			scratching_post_count,
+			texture_total,
+			bass_total
+		)
+		if melody_total > 0:
+			_draw_zone_aura(melody_anchor, int(lane_intensities.get("melody", 0)), accent, "melody")
+		if scratching_post_count > 0:
+			_draw_zone_aura(percussion_anchor, int(lane_intensities.get("percussion", 0)), accent, "percussion")
+		if texture_total > 0:
+			_draw_zone_aura(texture_anchor, int(lane_intensities.get("texture", 0)), accent, "texture")
+		if bass_total > 0:
+			_draw_zone_aura(bass_anchor, int(lane_intensities.get("bass", 0)), accent, "bass")
+		_draw_melody_nook(
+			melody_anchor,
+			kitten_count,
+			house_cat_count,
+			upgrade_icon_textures.get("kitten") as Texture2D,
+			upgrade_icon_textures.get("house_cat") as Texture2D,
+			sand,
+			wood,
+			accent,
+			ink
+		)
+		_draw_percussion_deck(
+			percussion_anchor,
+			scratching_post_count,
+			upgrade_icon_textures.get("scratching_post") as Texture2D,
+			sand,
+			wood,
+			accent
+		)
+		_draw_texture_corner(
+			texture_anchor,
+			yarn_basket_count,
+			cat_choir_count,
+			upgrade_icon_textures.get("yarn_basket") as Texture2D,
+			upgrade_icon_textures.get("cat_choir") as Texture2D,
+			sand,
+			wood,
+			accent
+		)
+		_draw_bass_terrace(
+			bass_anchor,
+			cat_tower_count,
+			grand_meowstro_count,
+			upgrade_icon_textures.get("cat_tower") as Texture2D,
+			upgrade_icon_textures.get("grand_meowstro") as Texture2D,
+			sand,
+			wood,
+			accent,
+			highlight
+		)
 
-	func _progression_anchor(index: int, total: int) -> Vector2:
+	func _upgrade_count(upgrade_id: String) -> int:
+		return int(owned_upgrades.get(upgrade_id, 0))
+
+	func _zone_anchor(offset: Vector2) -> Vector2:
 		var center = _yarn_center()
-		var ring = Vector2(_yarn_radius() * 2.52, _yarn_radius() * 1.76)
-		var normalized_anchors = [
-			Vector2(0.00, -0.58),
-			Vector2(-0.36, -0.52),
-			Vector2(0.36, -0.52),
-			Vector2(0.68, -0.34),
-			Vector2(0.74, 0.12),
-			Vector2(0.42, 0.52),
-			Vector2(-0.42, 0.52),
-			Vector2(-0.74, 0.12),
-			Vector2(-0.68, -0.34),
-			Vector2(0.00, 0.62)
-		]
-		if total <= normalized_anchors.size():
-			var normalized = normalized_anchors[index]
-			return center + Vector2(normalized.x * ring.x, normalized.y * ring.y)
-		var angle = -PI / 2.0 + TAU * float(index) / max(1.0, float(total))
-		return center + Vector2(cos(angle) * ring.x, sin(angle) * ring.y)
+		return center + Vector2(offset.x * _yarn_radius() * 1.44, offset.y * _yarn_radius() * 1.16)
+
+	func _draw_mill_foundations(center: Vector2, melody_anchor: Vector2, percussion_anchor: Vector2, texture_anchor: Vector2, bass_anchor: Vector2, sand: Color, wood: Color, accent: Color, melody_total: int, percussion_total: int, texture_total: int, bass_total: int) -> void:
+		var r = _yarn_radius()
+		var hub_color = sand.lerp(wood, 0.20)
+		var trim_color = wood.darkened(0.10)
+		draw_arc(center, r * 1.18, 0.0, TAU, 64, trim_color.lerp(sand, 0.08), 6.0)
+		draw_arc(center, r * 1.04, 0.0, TAU, 64, hub_color.lightened(0.08), 3.0)
+		if melody_total > 0:
+			_draw_mill_attachment(center, melody_anchor, 16.0, sand.lightened(0.08), wood, accent)
+		if percussion_total > 0:
+			_draw_mill_attachment(center, percussion_anchor, 16.0, sand.lightened(0.08), wood, accent)
+		if texture_total > 0:
+			_draw_mill_attachment(center, texture_anchor, 18.0, sand.lightened(0.08), wood, accent)
+		if bass_total > 0:
+			_draw_mill_attachment(center, bass_anchor, 22.0, sand.lightened(0.08), wood, accent)
+
+	func _draw_mill_attachment(center: Vector2, anchor: Vector2, width: float, body: Color, trim: Color, accent: Color) -> void:
+		var direction = (anchor - center).normalized()
+		var start = center + direction * (_yarn_radius() * 1.08)
+		var end = anchor - direction * 24.0
+		draw_line(start, end, body, width)
+		draw_line(start, end, trim.darkened(0.06), max(2.0, width * 0.24))
+		var bridge_length = start.distance_to(end)
+		var plank_count = maxi(2, int(bridge_length / 16.0))
+		var cross = Vector2(-direction.y, direction.x)
+		for plank_index in range(plank_count + 1):
+			var t = float(plank_index) / float(plank_count)
+			var plank_center = start.lerp(end, t)
+			draw_line(
+				plank_center - cross * (width * 0.28),
+				plank_center + cross * (width * 0.28),
+				trim.darkened(0.14),
+				1.6
+			)
+		for post_center in [start, end]:
+			draw_circle(post_center, width * 0.22, trim.darkened(0.10))
+			draw_circle(post_center + Vector2(0, -1), width * 0.14, accent.lerp(body, 0.65))
+
+	func _draw_building_shadow(rect: Rect2) -> void:
+		draw_rounded_rect(Rect2(rect.position + Vector2(0, 6), rect.size), Color(0, 0, 0, 0.10), 10.0)
+
+	func _draw_small_building(body_rect: Rect2, roof_color: Color, wall_color: Color, wood: Color, roof_height: float = 18.0) -> void:
+		var shadow = Color(0, 0, 0, 0.10)
+		draw_rounded_rect(Rect2(body_rect.position + Vector2(0, 5), body_rect.size), shadow, 8.0)
+		draw_rounded_rect(body_rect, wall_color, 8.0)
+		var roof = PackedVector2Array([
+			body_rect.position + Vector2(-8, 2),
+			body_rect.position + Vector2(body_rect.size.x * 0.5, -roof_height),
+			body_rect.position + Vector2(body_rect.size.x + 8, 2),
+			body_rect.position + Vector2(body_rect.size.x + 2, 10),
+			body_rect.position + Vector2(2, 10)
+		])
+		draw_colored_polygon(roof, roof_color)
+		draw_line(body_rect.position + Vector2(4, 9), body_rect.position + Vector2(body_rect.size.x - 4, 9), wood.darkened(0.16), 1.6)
+
+	func _draw_mill_room(body_rect: Rect2, sand: Color, wood: Color, accent: Color, roof_height: float, window_offsets: Array, door_rect: Rect2 = Rect2()) -> void:
+		_draw_building_shadow(body_rect)
+		_draw_small_building(body_rect, accent.lerp(sand, 0.18), sand.lightened(0.08), wood, roof_height)
+		draw_line(
+			body_rect.position + Vector2(8, body_rect.size.y - 6),
+			body_rect.position + Vector2(body_rect.size.x - 8, body_rect.size.y - 6),
+			wood.darkened(0.12),
+			2.0
+		)
+		for offset_value in window_offsets:
+			var offset: Vector2 = offset_value
+			_draw_window(
+				body_rect.position + offset,
+				Vector2(11, 12),
+				wood.lightened(0.06),
+				sand.lightened(0.18)
+			)
+		if door_rect.size.x > 0.0 and door_rect.size.y > 0.0:
+			_draw_door(door_rect, wood.lightened(0.04), sand.darkened(0.02))
+
+	func _draw_window(center: Vector2, size: Vector2, frame: Color, glow: Color) -> void:
+		draw_rounded_rect(Rect2(center - size * 0.5, size), frame, 4.0)
+		draw_rounded_rect(Rect2(center - size * 0.38, size * 0.76), glow, 3.0)
+		draw_line(center + Vector2(0, -size.y * 0.30), center + Vector2(0, size.y * 0.30), frame.darkened(0.14), 1.2)
+		draw_line(center + Vector2(-size.x * 0.30, 0), center + Vector2(size.x * 0.30, 0), frame.darkened(0.14), 1.2)
+
+	func _draw_door(rect: Rect2, frame: Color, fill: Color) -> void:
+		draw_rounded_rect(rect, frame, 6.0)
+		draw_rounded_rect(rect.grow(-3.0), fill, 4.0)
+		draw_circle(rect.position + Vector2(rect.size.x - 6.0, rect.size.y * 0.52), 1.6, frame.darkened(0.18))
+
+	func _draw_foliage_tuft(center: Vector2, leaf: Color, flower: Color, scale: float) -> void:
+		var leaf_a = leaf.lightened(0.04)
+		var leaf_b = leaf.darkened(0.06)
+		draw_circle(center + Vector2(-8, 2) * scale, 9.0 * scale, leaf_a)
+		draw_circle(center + Vector2(0, -4) * scale, 11.0 * scale, leaf_b)
+		draw_circle(center + Vector2(8, 3) * scale, 8.0 * scale, leaf_a)
+		for bloom_offset in [Vector2(-6, -4), Vector2(3, -8), Vector2(8, 1)]:
+			draw_circle(center + bloom_offset * scale, 2.4 * scale, flower.lightened(0.08))
+
+	func _draw_zone_aura(anchor: Vector2, intensity: int, accent: Color, zone: String) -> void:
+		if intensity <= 0:
+			return
+		var aura = accent.lightened(0.18)
+		match zone:
+			"percussion":
+				aura = accent.lerp(Color("#ffd27a"), 0.35)
+			"texture":
+				aura = accent.lightened(0.28)
+			"bass":
+				aura = accent.darkened(0.04)
+		aura.a = 0.05 + intensity * 0.025
+		draw_circle(anchor + Vector2(0, 8), 16.0 + intensity * 7.0, aura)
+		for ring_index in range(intensity):
+			var ring_color = aura
+			ring_color.a *= 0.55 - ring_index * 0.10
+			var ring_radius = 18.0 + ring_index * 8.0 + sin(pulse * (1.2 + ring_index * 0.2)) * 1.6
+			draw_arc(anchor, ring_radius, 0.0, TAU, 28, ring_color, 1.2)
+
+	func _draw_melody_nook(anchor: Vector2, kitten_count: int, house_cat_count: int, kitten_icon: Texture2D, house_cat_icon: Texture2D, sand: Color, wood: Color, accent: Color, ink: Color) -> void:
+		var total = kitten_count + house_cat_count
+		if total <= 0:
+			return
+		if kitten_count > 0:
+			_draw_island_upgrade_icon(kitten_icon, anchor + Vector2(-18, 6), 40.0, 13.0)
+			if kitten_count > 1:
+				_draw_island_upgrade_icon(kitten_icon, anchor + Vector2(-34, 22), 26.0, 9.0)
+			if kitten_count > 2:
+				_draw_island_upgrade_icon(kitten_icon, anchor + Vector2(-4, 25), 24.0, 8.0)
+			if kitten_count > 3:
+				_draw_island_upgrade_icon(kitten_icon, anchor + Vector2(-24, 32), 22.0, 7.0)
+		if house_cat_count > 0:
+			_draw_island_upgrade_icon(house_cat_icon, anchor + Vector2(24, -6), 46.0, 15.0)
+			if house_cat_count > 1:
+				_draw_island_upgrade_icon(house_cat_icon, anchor + Vector2(30, 22), 28.0, 9.0)
+			if house_cat_count > 2:
+				_draw_island_upgrade_icon(house_cat_icon, anchor + Vector2(12, 30), 24.0, 8.0)
+		var melody_notes = mini(kitten_count + house_cat_count, 5)
+		for note_index in range(melody_notes):
+			var note_center = anchor + Vector2(-18.0 + note_index * 9.0, -20.0 - (note_index % 2) * 4.0)
+			draw_circle(note_center, 3.4, accent.lightened(0.18))
+			draw_line(note_center + Vector2(2.8, 0), note_center + Vector2(2.8, -8.0), ink, 1.2)
+
+	func _draw_percussion_deck(anchor: Vector2, scratching_post_count: int, icon_texture: Texture2D, sand: Color, wood: Color, accent: Color) -> void:
+		if scratching_post_count <= 0:
+			return
+		_draw_island_upgrade_icon(icon_texture, anchor + Vector2(0, 4), 52.0, 16.0)
+		if scratching_post_count > 1:
+			_draw_island_upgrade_icon(icon_texture, anchor + Vector2(-22, 22), 30.0, 10.0)
+		if scratching_post_count > 2:
+			_draw_island_upgrade_icon(icon_texture, anchor + Vector2(24, 20), 28.0, 9.0)
+		if scratching_post_count > 3:
+			_draw_island_upgrade_icon(icon_texture, anchor + Vector2(0, 28), 24.0, 8.0)
+
+	func _draw_texture_corner(anchor: Vector2, yarn_basket_count: int, cat_choir_count: int, basket_icon: Texture2D, choir_icon: Texture2D, sand: Color, wood: Color, accent: Color) -> void:
+		var total = yarn_basket_count + cat_choir_count
+		if total <= 0:
+			return
+		if yarn_basket_count > 0:
+			_draw_island_upgrade_icon(basket_icon, anchor + Vector2(-10, 4), 62.0, 18.0)
+			if yarn_basket_count > 1:
+				_draw_island_upgrade_icon(basket_icon, anchor + Vector2(-26, 28), 32.0, 10.0)
+			if yarn_basket_count > 2:
+				_draw_island_upgrade_icon(basket_icon, anchor + Vector2(10, 30), 28.0, 9.0)
+		if cat_choir_count > 0:
+			_draw_island_upgrade_icon(choir_icon, anchor + Vector2(28, -2), 44.0, 14.0)
+			if cat_choir_count > 1:
+				_draw_island_upgrade_icon(choir_icon, anchor + Vector2(30, 24), 28.0, 9.0)
+
+	func _draw_bass_terrace(anchor: Vector2, cat_tower_count: int, grand_meowstro_count: int, tower_icon: Texture2D, meowstro_icon: Texture2D, sand: Color, wood: Color, accent: Color, highlight: Color) -> void:
+		var total = cat_tower_count + grand_meowstro_count
+		if total <= 0:
+			return
+		if cat_tower_count > 0:
+			_draw_island_upgrade_icon(tower_icon, anchor + Vector2(-8, -2), 70.0, 20.0)
+			if cat_tower_count > 1:
+				_draw_island_upgrade_icon(tower_icon, anchor + Vector2(-34, 24), 34.0, 10.0)
+			if cat_tower_count > 2:
+				_draw_island_upgrade_icon(tower_icon, anchor + Vector2(16, 26), 30.0, 9.0)
+		if grand_meowstro_count > 0:
+			_draw_island_upgrade_icon(meowstro_icon, anchor + Vector2(34, -4), 46.0, 14.0)
+
+	func _draw_island_upgrade_icon(icon_texture: Texture2D, center: Vector2, size_value: float, shadow_radius: float) -> void:
+		if icon_texture == null:
+			return
+		draw_circle(center + Vector2(0, shadow_radius * 0.72), shadow_radius, Color(0, 0, 0, 0.10))
+		_draw_upgrade_icon_texture(icon_texture, center, size_value)
+
+	func _draw_upgrade_icon_texture(icon_texture: Texture2D, center: Vector2, size_value: float) -> void:
+		if icon_texture == null:
+			return
+		draw_texture_rect(icon_texture, Rect2(center - Vector2.ONE * size_value * 0.5, Vector2.ONE * size_value), false)
+
+	func _draw_paw_print(center: Vector2, scale: float, color: Color) -> void:
+		draw_circle(center + Vector2(0, 3) * scale, 3.8 * scale, color)
+		draw_circle(center + Vector2(-3.0, -2.2) * scale, 1.7 * scale, color)
+		draw_circle(center + Vector2(0, -3.0) * scale, 1.6 * scale, color)
+		draw_circle(center + Vector2(3.0, -2.0) * scale, 1.7 * scale, color)
 
 	func _owned_total() -> int:
 		var total = 0
@@ -962,8 +1351,12 @@ func _refresh_scene_view() -> void:
 	var current_stage = game_state.get_current_stage(current_mill_id)
 	var active_theme = game_state.get_active_theme_pack(current_mill_id)
 	var scene_upgrade_order = PackedStringArray()
+	var scene_upgrade_lanes = {}
+	var scene_upgrade_types = {}
 	for upgrade in game_state.get_mill_definition(current_mill_id).get("upgrades", []):
 		scene_upgrade_order.append(String(upgrade.get("id", "")))
+		scene_upgrade_lanes[String(upgrade.get("id", ""))] = String(upgrade.get("lane", "melody"))
+		scene_upgrade_types[String(upgrade.get("id", ""))] = String(upgrade.get("type", "common"))
 	scene_view.set_scene_data({
 		"palette": active_theme.get("palette", {}),
 		"stage_name": String(current_stage.get("name", "Starter Skein")),
@@ -977,6 +1370,8 @@ func _refresh_scene_view() -> void:
 		"lane_intensities": game_state.get_lane_intensities(current_mill_id),
 		"owned_upgrades": mill_state.get("upgrades", {}),
 		"upgrade_order": scene_upgrade_order,
+		"upgrade_lanes": scene_upgrade_lanes,
+		"upgrade_types": scene_upgrade_types,
 		"upgrade_icons": active_theme.get("upgrade_icons", {}),
 		"scene_assets": active_theme.get("scene_assets", {})
 	})
